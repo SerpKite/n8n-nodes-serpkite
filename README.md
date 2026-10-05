@@ -4,9 +4,9 @@ Use [SerpKite](https://serpkite.com) to search Google, search Google News, and r
 
 ## Installation
 
-In self-hosted n8n, go to **Settings → Community nodes → Install** and enter `n8n-nodes-serpkite` once the npm package is published. See [n8n's community node installation guide](https://docs.n8n.io/integrations/community-nodes/installation/).
+In self-hosted n8n, go to **Settings → Community nodes → Install** and enter `n8n-nodes-serpkite`. See [n8n's community node installation guide](https://docs.n8n.io/integrations/community-nodes/installation/).
 
-This repository is implemented and tested. npm publication and n8n Creator Portal verification are separate release steps; do not assume the package is already published or verified.
+[Version 0.1.0 is published on npm](https://www.npmjs.com/package/n8n-nodes-serpkite) with GitHub Actions provenance. n8n Creator Portal verification is a separate review; the package is not yet verified.
 
 ## Credentials
 
