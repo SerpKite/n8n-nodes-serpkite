@@ -36,7 +36,7 @@ Tests mock the HTTP helper and cover multi-item search/news, localization, item 
 
 ## Release and provenance
 
-The publish workflow runs tests and lint, then publishes with npm provenance from a version tag. Configure npm trusted publishing for owner `SerpKite`, repository `n8n-nodes-serpkite`, workflow `publish.yml`, or provide the repository's `NPM_TOKEN` secret. The initial npm package may need to be created using an authenticated npm session before trusted publishing can be enabled. Create a version tag only after npm publishing access is ready.
+The publish workflow runs tests and lint, then publishes with npm provenance from a version tag using npm trusted publishing (GitHub OIDC). The trusted publisher is configured for owner `SerpKite`, repository `n8n-nodes-serpkite`, and workflow `publish.yml`. No npm token or repository publish secret is required. Push a tag matching the package version, such as `v0.1.1`, only when releasing that version.
 
 After publication, submit the package at [n8n Creator Portal](https://creators.n8n.io) for verification. Verification is reviewed by n8n.
 
