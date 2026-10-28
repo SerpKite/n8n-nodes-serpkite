@@ -1,0 +1,283 @@
+import type { INodeProperties } from 'n8n-workflow';
+import {
+	excludePaths,
+	fetchCountry,
+	fields,
+	format,
+	ignoreQueryParameters,
+	includeHtml,
+	includeImages,
+	includeLinks,
+	includePaths,
+	includeSubdomains,
+	maxAge,
+	maxTokens,
+	maxWait,
+	outputSchema,
+	sitemap,
+	taskId,
+	waitForCompletion,
+	webhookUrl,
+} from './fields';
+
+export const webOperations: INodeProperties[] = [
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: { show: { resource: ['web'] } },
+		options: [
+			{
+				name: 'Extract Pages',
+				value: 'extract',
+				description:
+					'Read up to 20 URLs as Markdown, text or HTML, with query-ranked highlights, an AI summary or JSON extracted with a schema',
+				action: 'Extract pages',
+			},
+			{
+				name: 'Fetch Webpage',
+				value: 'webpage',
+				description: 'Read a public HTML or PDF URL as clean Markdown with metadata',
+				action: 'Fetch a webpage',
+			},
+			{
+				name: 'Get Crawl',
+				value: 'getCrawl',
+				description: 'Get the status and pages of a crawl, optionally waiting for it to finish',
+				action: 'Get a crawl',
+			},
+			{
+				name: 'Map Site',
+				value: 'map',
+				description:
+					"List a site's URLs from its sitemaps and links, optionally ranked by a search",
+				action: 'Map a site',
+			},
+			{
+				name: 'Start Crawl',
+				value: 'crawl',
+				description:
+					'Start reading a whole site or section as Markdown, optionally waiting for the result',
+				action: 'Start a crawl',
+			},
+		],
+		default: 'webpage',
+	},
+];
+
+export const webFields: INodeProperties[] = [
+	{
+		displayName: 'URL',
+		name: 'url',
+		type: 'string',
+		default: '',
+		required: true,
+		displayOptions: { show: { resource: ['web'], operation: ['webpage'] } },
+		placeholder: 'https://example.com/article',
+		description: 'Public HTTP or HTTPS URL of an HTML page or a PDF',
+	},
+	{
+		displayName: 'URLs',
+		name: 'urls',
+		type: 'string',
+		typeOptions: { rows: 4 },
+		default: '',
+		required: true,
+		displayOptions: { show: { resource: ['web'], operation: ['extract'] } },
+		placeholder: 'https://example.com/pricing\nhttps://example.com/docs/limits.pdf',
+		description:
+			'Up to 20 HTML pages or PDFs, one per line or comma-separated. Only the pages that come back are billed.',
+	},
+	{
+		displayName: 'Site URL',
+		name: 'url',
+		type: 'string',
+		default: '',
+		required: true,
+		displayOptions: { show: { resource: ['web'], operation: ['map', 'crawl'] } },
+		placeholder: 'https://docs.example.com/',
+		description: 'The site, or the page to start from',
+	},
+	{
+		...taskId,
+		displayOptions: { show: { resource: ['web'], operation: ['getCrawl'] } },
+	},
+	{
+		...waitForCompletion,
+		displayOptions: { show: { resource: ['web'], operation: ['crawl', 'getCrawl'] } },
+	},
+	{
+		...maxWait,
+		displayOptions: {
+			show: { resource: ['web'], operation: ['crawl', 'getCrawl'], waitForCompletion: [true] },
+		},
+	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: { show: { resource: ['web'], operation: ['webpage'] } },
+		options: [fetchCountry, fields, includeHtml, includeImages, includeLinks, maxAge, format],
+	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: { show: { resource: ['web'], operation: ['extract'] } },
+		options: [
+			{
+				displayName: 'AI Summary',
+				name: 'summary',
+				type: 'boolean',
+				default: false,
+				description:
+					'Whether to add a 3–6 sentence AI summary of each page (extra credits per page; focused on Query when set)',
+			},
+			{
+				displayName: 'Content Format',
+				name: 'format',
+				type: 'options',
+				options: [
+					{ name: 'HTML', value: 'html' },
+					{ name: 'Markdown', value: 'markdown' },
+					{ name: 'Text', value: 'text' },
+				],
+				default: 'markdown',
+				description: 'Format of each page',
+			},
+			fetchCountry,
+			{
+				displayName: 'Extraction Prompt',
+				name: 'prompt',
+				type: 'string',
+				typeOptions: { rows: 3 },
+				default: '',
+				description: 'Guides the Output Schema extraction: what to pick and how to normalise it',
+			},
+			{
+				displayName: 'Highlights',
+				name: 'highlights',
+				type: 'number',
+				typeOptions: { minValue: 0, maxValue: 10 },
+				default: 3,
+				description: 'Passages per page most relevant to Query (0–10; needs Query)',
+			},
+			includeImages,
+			includeLinks,
+			maxAge,
+			maxTokens,
+			{
+				...outputSchema,
+				description:
+					"A JSON Schema (at most 16 KB): each page's data is returned as JSON matching it in output (extra credits per page)",
+			},
+			{
+				displayName: 'Query',
+				name: 'query',
+				type: 'string',
+				default: '',
+				description: 'What highlights are ranked against and summaries focus on',
+			},
+			{
+				displayName: 'Timeout (Seconds)',
+				name: 'timeout',
+				type: 'number',
+				typeOptions: { minValue: 1, maxValue: 90 },
+				default: 50,
+				description:
+					'Seconds to wait for the pages (default 50, or 75 with AI Summary or Output Schema). Pages still loading are listed in failed and not billed.',
+			},
+		],
+	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: { show: { resource: ['web'], operation: ['map'] } },
+		options: [
+			excludePaths,
+			ignoreQueryParameters,
+			includePaths,
+			includeSubdomains,
+			{
+				displayName: 'Limit',
+				name: 'limit',
+				type: 'number',
+				typeOptions: { minValue: 1, maxValue: 5000 },
+				default: 50,
+				description: 'Max number of results to return',
+			},
+			{
+				displayName: 'Search',
+				name: 'search',
+				type: 'string',
+				default: '',
+				description: 'Keep only URLs relevant to these words, most relevant first',
+			},
+			sitemap,
+		],
+	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: { show: { resource: ['web'], operation: ['crawl'] } },
+		options: [
+			{
+				displayName: 'Content Format',
+				name: 'format',
+				type: 'options',
+				options: [
+					{ name: 'Markdown', value: 'markdown' },
+					{ name: 'Text', value: 'text' },
+				],
+				default: 'markdown',
+				description: 'Format of each page',
+			},
+			excludePaths,
+			ignoreQueryParameters,
+			includeLinks,
+			includePaths,
+			includeSubdomains,
+			{
+				displayName: 'Limit',
+				name: 'limit',
+				type: 'number',
+				typeOptions: { minValue: 1, maxValue: 1000 },
+				default: 50,
+				// The crawl limit counts pages read, not results returned.
+				// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-limit
+				description:
+					'Max number of pages to read (1–1000). This many credits are reserved up front and the unused part is refunded.',
+			},
+			maxAge,
+			{
+				displayName: 'Max Depth',
+				name: 'max_depth',
+				type: 'number',
+				typeOptions: { minValue: 0, maxValue: 10 },
+				default: 2,
+				description: 'Link hops from the start page (0 reads only the start page)',
+			},
+						maxTokens,
+			{
+				displayName: 'Query',
+				name: 'query',
+				type: 'string',
+				default: '',
+				description: 'Read the pages most relevant to these words first',
+			},
+			sitemap,
+			webhookUrl,
+		],
+	},
+];

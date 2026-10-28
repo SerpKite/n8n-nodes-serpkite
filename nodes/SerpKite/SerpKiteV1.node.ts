@@ -7,7 +7,7 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
-export class SerpKite implements INodeType {
+export class SerpKiteV1 implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SerpKite',
 		name: 'serpKite',
