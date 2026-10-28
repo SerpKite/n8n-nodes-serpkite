@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-serpkite",
-  "version": "0.1.0",
-  "description": "Google search, news, and webpage Markdown with SerpKite for workflows and AI agents",
+  "version": "0.2.0",
+  "description": "Google search and its verticals, maps and reviews, webpage extraction and crawling, cited AI answers, research and AI assistant answers with SerpKite for n8n workflows and AI agents",
   "license": "MIT",
   "homepage": "https://serpkite.com",
   "keywords": [
